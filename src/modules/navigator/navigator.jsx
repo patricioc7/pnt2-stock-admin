@@ -2,8 +2,9 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import Login from "./login";
 
-function Navigator() {
+const Navigator = () => {
   return (
     <Navbar bg="light" expand="lg">
       <Container>
@@ -25,6 +26,9 @@ function Navigator() {
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
+        </Navbar.Collapse>
+        <Navbar.Collapse className="justify-content-end">
+          <Login />
         </Navbar.Collapse>
       </Container>
     </Navbar>
