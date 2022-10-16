@@ -28,8 +28,6 @@ const Login = () => {
   };
 
   const handleLogin = () => {
-    alert("Intentó loguearse");
-    console.log(userNameAndPassword);
     apiClient.login(userNameAndPassword).then((response) => {
       setSessionCookie(response.data.token);
       window.location.reload();

@@ -16,31 +16,44 @@ const Stocks = () => {
   const [stores, setStores] = useState(undefined);
   const [showNewStockModal, setShowNewStockModal] = useState(false);
   const [newStock, setNewStock] = useState({});
-  const session = useContext(SessionContext);
+  const jwt = useContext(SessionContext);
 
   useEffect(() => {
-    ApiClient.getAllStocks(session).then((data) => {
-      setStocks(data);
-      console.log(data.data);
-    });
-    ApiClient.getAllProducts(session).then((data) => {
-      setProducts(data);
-      console.log(data);
-    });
-    ApiClient.getAllStores(session).then((data) => {
-      setStores(data);
-      console.log(data);
-    });
+    ApiClient.getAllProducts(jwt)
+      .then((allProductsResponse) => setProducts(allProductsResponse.data))
+      .then(() => {
+        ApiClient.getAllStores(jwt)
+          .then((allStoresResponse) => setStores(allStoresResponse.data))
+          .then(() => {
+            ApiClient.getAllStocks(jwt).then((allStocksData) =>
+              setStocks(allStocksData.data)
+            );
+          });
+      });
   }, []);
 
   const handleCloseNewStockModal = () => setShowNewStockModal(false);
   const handleShowNewStockModal = () => setShowNewStockModal(true);
 
   const handleSaveNewStock = () => {
-    apiClient.addNewStock(session, newStock).then(() => {
+    apiClient.addNewStock(jwt, newStock).then(() => {
       apiClient.getAllStocks().then((data) => setStocks(data));
       setShowNewStockModal(false);
     });
+  };
+
+  const getProductName = (productId) => {
+    const found = products.find((p) => productId === p._id);
+    if (found) {
+      return found.name;
+    }
+  };
+
+  const getStoreName = (storeId) => {
+    const found = stores.find((s) => storeId === s._id);
+    if (found) {
+      return found.name;
+    }
   };
 
   return (
@@ -62,13 +75,13 @@ const Stocks = () => {
             </thead>
             <tbody>
               {stocks &&
-                stocks.data.map((stock) => {
+                stocks.map((stock) => {
                   return (
                     <tr>
                       <td>{stock._id}</td>
-                      <td>{stock.productId}</td>
+                      <td>{getProductName(stock.productId)}</td>
                       <td>{stock.qty}</td>
-                      <td>{stock.storeId}</td>
+                      <td>{getStoreName(stock.storeId)}</td>
                       <td>Sumar - Vender</td>
                     </tr>
                   );
@@ -92,7 +105,7 @@ const Stocks = () => {
                 }
               >
                 {products &&
-                  products.data.map((product) => {
+                  products.map((product) => {
                     return (
                       <option key={product._id} value={product._id}>
                         {product.name}
@@ -110,7 +123,7 @@ const Stocks = () => {
                 }
               >
                 {stores &&
-                  stores.data.map((store) => {
+                  stores.map((store) => {
                     return (
                       <option key={store._id} value={store._id}>
                         {store.name}
