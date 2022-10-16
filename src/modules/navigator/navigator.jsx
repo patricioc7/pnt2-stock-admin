@@ -33,6 +33,6 @@ const Navigator = () => {
       </Container>
     </Navbar>
   );
-}
+};
 
 export default Navigator;

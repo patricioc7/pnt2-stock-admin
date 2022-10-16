@@ -3,19 +3,19 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import ApiClient from "../../services/apiClient";
-import { useState, useEffect,useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Button } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
-import {SessionContext} from "../../context/sessionContext";
+import { SessionContext } from "../../context/sessionContext";
 
 const Stocks = () => {
   const [stocks, setStocks] = useState(undefined);
   const [products, setProducts] = useState(undefined);
   const [stores, setStores] = useState(undefined);
   const [showNewStockModal, setShowNewStockModal] = useState(false);
-  const [newStock, setNewStock] = useState({})
+  const [newStock, setNewStock] = useState({});
   const session = useContext(SessionContext);
 
   useEffect(() => {
@@ -37,12 +37,10 @@ const Stocks = () => {
   const handleShowNewStockModal = () => setShowNewStockModal(true);
 
   const handleSaveNewStock = () => {
-    apiClient
-      .addNewStock(session, newStock)
-      .then(() => {
-        apiClient.getAllStocks().then((data) => setStocks(data));
-        setShowNewStockModal(false);
-      });
+    apiClient.addNewStock(session, newStock).then(() => {
+      apiClient.getAllStocks().then((data) => setStocks(data));
+      setShowNewStockModal(false);
+    });
   };
 
   return (
@@ -88,21 +86,37 @@ const Stocks = () => {
           <Form>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Producto:</Form.Label>
-              <Form.Select onChange={e => setNewStock({ ...newStock, productId: e.target.value })}>
+              <Form.Select
+                onChange={(e) =>
+                  setNewStock({ ...newStock, productId: e.target.value })
+                }
+              >
                 {products &&
                   products.data.map((product) => {
-                    return <option key={product._id} value={product._id}>{product.name}</option>;
+                    return (
+                      <option key={product._id} value={product._id}>
+                        {product.name}
+                      </option>
+                    );
                   })}
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
               <Form.Label>Store:</Form.Label>
-              <Form.Select onChange={e => setNewStock({ ...newStock, storeId: e.target.value })}>
+              <Form.Select
+                onChange={(e) =>
+                  setNewStock({ ...newStock, storeId: e.target.value })
+                }
+              >
                 {stores &&
-                    stores.data.map((store) => {
-                      return <option key={store._id} value={store._id}>{store.name}</option>;
-                    })}
+                  stores.data.map((store) => {
+                    return (
+                      <option key={store._id} value={store._id}>
+                        {store.name}
+                      </option>
+                    );
+                  })}
               </Form.Select>
             </Form.Group>
           </Form>

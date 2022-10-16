@@ -3,7 +3,6 @@ import axios from "axios";
 const BASE_URL = "http://localhost:3000";
 
 const ApiClient = {
-
   login: (body) => {
     return axios.post(`${BASE_URL}/user/login`, body);
   },
@@ -27,14 +26,16 @@ const ApiClient = {
   getAllStores: (jwt) => {
     return axios.get(`${BASE_URL}/store/`, {
       headers: {
-        Authorization: jwt,},
+        Authorization: jwt,
+      },
     });
   },
 
   addNewStock: (jwt, newStock) => {
     return axios.post(`${BASE_URL}/stock/`, newStock, {
       headers: {
-        Authorization: jwt,},
+        Authorization: jwt,
+      },
     });
   },
 };
