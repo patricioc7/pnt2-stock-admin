@@ -9,6 +9,7 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
 import { SessionContext } from "../../context/sessionContext";
+import { AiFillDollarCircle, AiFillPlusCircle , AiOutlineDelete} from "react-icons/ai"
 
 const Stocks = () => {
   const [stocks, setStocks] = useState(undefined);
@@ -16,6 +17,13 @@ const Stocks = () => {
   const [stores, setStores] = useState(undefined);
   const [showNewStockModal, setShowNewStockModal] = useState(false);
   const [newStock, setNewStock] = useState({});
+
+
+
+  const [selectedStock, setSelectedStock] = useState({});
+  const [quantity, setQuantity] = useState(0)
+  const [showIncreseModal, setShowIncreseModal] = useState(false);
+
   const jwt = useContext(SessionContext);
 
   useEffect(() => {
@@ -35,6 +43,12 @@ const Stocks = () => {
   const handleCloseNewStockModal = () => setShowNewStockModal(false);
   const handleShowNewStockModal = () => setShowNewStockModal(true);
 
+  const handleCloseAddModal = () => setShowIncreseModal(false);
+
+  const handleQuantityChange = (qty) => {
+    setQuantity(qty)
+  }
+
   const handleSaveNewStock = () => {
     apiClient.addNewStock(jwt, newStock).then(() => {
       apiClient.getAllStocks().then((data) => setStocks(data));
@@ -42,19 +56,36 @@ const Stocks = () => {
     });
   };
 
+  const handleIncreaseQuantity = () => {
+    ApiClient.increaseStock(jwt, selectedStock._id, quantity).then( () =>
+        ApiClient.getAllStocks(jwt).then(response =>setStocks(response.data) )
+    )
+    setShowIncreseModal(false);
+  }
+
   const getProductName = (productId) => {
-    const found = products.find((p) => productId === p._id);
-    if (found) {
-      return found.name;
+    if(products) {
+      const found = products.find((p) => productId === p._id);
+      if (found) {
+        return found.name;
+      }
     }
+
   };
 
   const getStoreName = (storeId) => {
-    const found = stores.find((s) => storeId === s._id);
-    if (found) {
-      return found.name;
+    if(stocks){
+      const found = stores.find((s) => storeId === s._id);
+      if (found) {
+        return found.name;
+      }
     }
   };
+
+  const handleIncreaseModalShow = (stock) => {
+    setSelectedStock(stock);
+    setShowIncreseModal(true);
+  }
 
   return (
     <Container>
@@ -82,7 +113,7 @@ const Stocks = () => {
                       <td>{getProductName(stock.productId)}</td>
                       <td>{stock.qty}</td>
                       <td>{getStoreName(stock.storeId)}</td>
-                      <td>Sumar - Vender</td>
+                      <td><AiFillPlusCircle onClick={() => handleIncreaseModalShow(stock)} /> - <AiFillDollarCircle /> - <AiOutlineDelete/></td>
                     </tr>
                   );
                 })}
@@ -91,14 +122,15 @@ const Stocks = () => {
         </Col>
       </Row>
 
+      {/*NEW INCREASE MODAL*/}
       <Modal show={showNewStockModal} onHide={handleCloseNewStockModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Sumar nuevo stock</Modal.Title>
+          <Modal.Title>Incrementar stock</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Producto:</Form.Label>
+              <Form.Label>Cantidad:</Form.Label>
               <Form.Select
                 onChange={(e) =>
                   setNewStock({ ...newStock, productId: e.target.value })
@@ -143,6 +175,41 @@ const Stocks = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {/* END NEW STOCK MODAL*/}
+
+      {/*ADD STOCK MODAL*/}
+      <Modal show={showIncreseModal} onHide={handleCloseAddModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Sumar stock</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="quantity">
+              <p><b>Stock:</b> {selectedStock._id}</p>
+              <p><b>Producto:</b> {getProductName(selectedStock.productId)}</p>
+              <p><b>Store:</b> {getStoreName(selectedStock.storeId)}</p>
+              <Form.Label>Cantidad:</Form.Label>
+              <Form.Control
+                  type="number"
+                  placeholder="0"
+                  onChange={(e) => handleQuantityChange( e.target.value)}
+              />
+            </Form.Group>
+
+
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseAddModal}>
+            Cerrar
+          </Button>
+          <Button variant="primary" onClick={handleIncreaseQuantity}>
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* END INCREASE STOCK MODAL*/}
+
     </Container>
   );
 };

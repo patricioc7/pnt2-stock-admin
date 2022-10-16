@@ -38,5 +38,13 @@ const ApiClient = {
       },
     });
   },
+
+  increaseStock: (jwt, stockId, qty) => {
+    return axios.put(`${BASE_URL}/stock/${stockId}/increase/${qty}`,  {},{
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
 };
 export default ApiClient;
