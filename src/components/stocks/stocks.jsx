@@ -10,6 +10,7 @@ import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
 import { SessionContext } from "../../context/sessionContext";
 import { AiFillDollarCircle, AiFillPlusCircle , AiOutlineDelete} from "react-icons/ai"
+import Paginator from "../paginator/paginator";
 
 const Stocks = () => {
   const [stocks, setStocks] = useState(undefined);
@@ -17,6 +18,8 @@ const Stocks = () => {
   const [stores, setStores] = useState(undefined);
   const [showNewStockModal, setShowNewStockModal] = useState(false);
   const [newStock, setNewStock] = useState({});
+
+  const [loading, setLoading] = useState(true);
 
   const [selectedStock, setSelectedStock] = useState({});
   const [quantity, setQuantity] = useState(0)
@@ -101,6 +104,14 @@ const Stocks = () => {
     setShowConfirmDeleteModal(false)
   }
 
+  const handlePageChange = (pageNumber) => {
+    setLoading(true);
+    ApiClient.getAllStocksPaginated(pageNumber).then((response) => {
+      setStocks(response.data);
+      setLoading(false);
+    });
+  };
+
   return (
     <Container>
       <Row>
@@ -128,14 +139,18 @@ const Stocks = () => {
                       <td>{stock.qty}</td>
                       <td>{getStoreName(stock.storeId)}</td>
                       <td><AiFillPlusCircle onClick={() => handleIncreaseModalShow(stock)} />
-                        - <AiFillDollarCircle />
-                        - <AiOutlineDelete onClick={() => handleDeleteConfirmation(stock)}/></td>
+                         <AiFillDollarCircle />
+                         <AiOutlineDelete onClick={() => handleDeleteConfirmation(stock)}/></td>
                     </tr>
                   );
                 })}
             </tbody>
           </Table>
         </Col>
+      </Row>
+
+      <Row>
+        <Paginator handlePageChange={handlePageChange} />
       </Row>
 
       {/*NEW INCREASE MODAL*/}

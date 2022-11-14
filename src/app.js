@@ -6,6 +6,7 @@ import Stocks from "./components/stocks/stocks";
 import { SessionContext } from "./context/sessionContext";
 import { getSessionCookie } from "./services/sessionCookie";
 import Products from "./components/products/products";
+import Stores from "./components/stores/stores";
 
 export default function App() {
   const [session, setSession] = useState(getSessionCookie());
@@ -26,6 +27,9 @@ export default function App() {
             </Route>
             <Route path="/stocks">
               <Stocks />
+            </Route>
+            <Route path="/stores">
+              <Stores />
             </Route>
             <Route path="/products">
               <Products />
