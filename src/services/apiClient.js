@@ -23,6 +23,22 @@ const ApiClient = {
     });
   },
 
+  addNewProduct: (jwt, newProduct) => {
+    return axios.post(`${BASE_URL}/product/`, newProduct, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
+
+  deleteProduct: (jwt, productId, ) => {
+    return axios.delete(`${BASE_URL}/product/${productId}`,  {
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
+
   getAllStores: (jwt) => {
     return axios.get(`${BASE_URL}/store/`, {
       headers: {
@@ -41,6 +57,14 @@ const ApiClient = {
 
   increaseStock: (jwt, stockId, qty) => {
     return axios.put(`${BASE_URL}/stock/${stockId}/increase/${qty}`,  {},{
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
+
+  deleteStock: (jwt, stockId, ) => {
+    return axios.delete(`${BASE_URL}/stock/${stockId}`,  {
       headers: {
         Authorization: jwt,
       },

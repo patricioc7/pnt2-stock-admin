@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Navigator from "./modules/navigator/navigator";
-import Footer from "./modules/footer/footer";
-import Stocks from "./modules/stocks/stocks";
+import Navigator from "./components/navigator/navigator";
+import Footer from "./components/footer/footer";
+import Stocks from "./components/stocks/stocks";
 import { SessionContext } from "./context/sessionContext";
 import { getSessionCookie } from "./services/sessionCookie";
+import Products from "./components/products/products";
 
 export default function App() {
   const [session, setSession] = useState(getSessionCookie());
@@ -19,13 +20,17 @@ export default function App() {
         <div>
           <Navigator />
           <Switch>
-            <Route path="/">
-              <Stocks />
-            </Route>
+
             <Route path="/users">
               <Users />
             </Route>
-            <Route path="/Stocks">
+            <Route path="/stocks">
+              <Stocks />
+            </Route>
+            <Route path="/products">
+              <Products />
+            </Route>
+            <Route path="/">
               <Stocks />
             </Route>
           </Switch>
