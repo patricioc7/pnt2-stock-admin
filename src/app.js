@@ -21,7 +21,6 @@ export default function App() {
         <div>
           <Navigator />
           <Switch>
-
             <Route path="/users">
               <Users />
             </Route>

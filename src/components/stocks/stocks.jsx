@@ -9,7 +9,11 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
 import { SessionContext } from "../../context/sessionContext";
-import { AiFillDollarCircle, AiFillPlusCircle , AiOutlineDelete} from "react-icons/ai"
+import {
+  AiFillDollarCircle,
+  AiFillPlusCircle,
+  AiOutlineDelete,
+} from "react-icons/ai";
 import Paginator from "../paginator/paginator";
 
 const Stocks = () => {
@@ -22,9 +26,8 @@ const Stocks = () => {
   const [loading, setLoading] = useState(true);
 
   const [selectedStock, setSelectedStock] = useState({});
-  const [quantity, setQuantity] = useState(0)
+  const [quantity, setQuantity] = useState(0);
   const [showIncreseModal, setShowIncreseModal] = useState(false);
-
 
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
 
@@ -37,7 +40,7 @@ const Stocks = () => {
         ApiClient.getAllStores(jwt)
           .then((allStoresResponse) => setStores(allStoresResponse.data))
           .then(() => {
-            ApiClient.getAllStocks(jwt).then((allStocksData) =>
+            ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) =>
               setStocks(allStocksData.data)
             );
           });
@@ -51,8 +54,8 @@ const Stocks = () => {
   const handleCloseDeleteModal = () => setShowConfirmDeleteModal(false);
 
   const handleQuantityChange = (qty) => {
-    setQuantity(qty)
-  }
+    setQuantity(qty);
+  };
 
   const handleSaveNewStock = () => {
     apiClient.addNewStock(jwt, newStock).then(() => {
@@ -62,24 +65,23 @@ const Stocks = () => {
   };
 
   const handleIncreaseQuantity = () => {
-    ApiClient.increaseStock(jwt, selectedStock._id, quantity).then( () =>
-        ApiClient.getAllStocks(jwt).then(response =>setStocks(response.data) )
-    )
+    ApiClient.increaseStock(jwt, selectedStock._id, quantity).then(() =>
+      ApiClient.getAllStocks(jwt).then((response) => setStocks(response.data))
+    );
     setShowIncreseModal(false);
-  }
+  };
 
   const getProductName = (productId) => {
-    if(products) {
+    if (products) {
       const found = products.find((p) => productId === p._id);
       if (found) {
         return found.name;
       }
     }
-
   };
 
   const getStoreName = (storeId) => {
-    if(stocks){
+    if (stocks) {
       const found = stores.find((s) => storeId === s._id);
       if (found) {
         return found.name;
@@ -90,23 +92,28 @@ const Stocks = () => {
   const handleIncreaseModalShow = (stock) => {
     setSelectedStock(stock);
     setShowIncreseModal(true);
-  }
+  };
 
   const handleDeleteConfirmation = (stock) => {
-    setSelectedStock(stock)
-    setShowConfirmDeleteModal(true)
-  }
+    setSelectedStock(stock);
+    setShowConfirmDeleteModal(true);
+  };
 
   const handleDelete = () => {
-    apiClient.deleteProduct(jwt, selectedStock._id).then(() =>
-        apiClient.getAllProducts( jwt). then(response => setStocks(response.data))
-    )
-    setShowConfirmDeleteModal(false)
-  }
+    apiClient
+      .deleteProduct(jwt, selectedStock._id)
+      .then(() =>
+        apiClient
+          .getAllProducts(jwt)
+          .then((response) => setStocks(response.data))
+      );
+    setShowConfirmDeleteModal(false);
+  };
 
   const handlePageChange = (pageNumber) => {
     setLoading(true);
-    ApiClient.getAllStocksPaginated(pageNumber).then((response) => {
+    console.log(pageNumber)
+    ApiClient.getAllStocksPaginated(jwt, pageNumber).then((response) => {
       setStocks(response.data);
       setLoading(false);
     });
@@ -138,9 +145,15 @@ const Stocks = () => {
                       <td>{getProductName(stock.productId)}</td>
                       <td>{stock.qty}</td>
                       <td>{getStoreName(stock.storeId)}</td>
-                      <td><AiFillPlusCircle onClick={() => handleIncreaseModalShow(stock)} />
-                         <AiFillDollarCircle />
-                         <AiOutlineDelete onClick={() => handleDeleteConfirmation(stock)}/></td>
+                      <td>
+                        <AiFillPlusCircle
+                          onClick={() => handleIncreaseModalShow(stock)}
+                        />
+                        <AiFillDollarCircle />
+                        <AiOutlineDelete
+                          onClick={() => handleDeleteConfirmation(stock)}
+                        />
+                      </td>
                     </tr>
                   );
                 })}
@@ -216,14 +229,20 @@ const Stocks = () => {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3" controlId="quantity">
-              <p><b>Stock:</b> {selectedStock._id}</p>
-              <p><b>Producto:</b> {getProductName(selectedStock.productId)}</p>
-              <p><b>Store:</b> {getStoreName(selectedStock.storeId)}</p>
+              <p>
+                <b>Stock:</b> {selectedStock._id}
+              </p>
+              <p>
+                <b>Producto:</b> {getProductName(selectedStock.productId)}
+              </p>
+              <p>
+                <b>Store:</b> {getStoreName(selectedStock.storeId)}
+              </p>
               <Form.Label>Cantidad:</Form.Label>
               <Form.Control
-                  type="number"
-                  placeholder="0"
-                  onChange={(e) => handleQuantityChange( e.target.value)}
+                type="number"
+                placeholder="0"
+                onChange={(e) => handleQuantityChange(e.target.value)}
               />
             </Form.Group>
           </Form>
@@ -244,8 +263,7 @@ const Stocks = () => {
         <Modal.Header closeButton>
           <Modal.Title>Está seguro?</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-        </Modal.Body>
+        <Modal.Body></Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseDeleteModal}>
             Cerrar
@@ -256,7 +274,6 @@ const Stocks = () => {
         </Modal.Footer>
       </Modal>
       {/* END DELETE STOCK MODAL*/}
-
     </Container>
   );
 };

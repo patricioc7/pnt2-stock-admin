@@ -2,6 +2,8 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:3000";
 
+const pageSize = 3;
+
 const ApiClient = {
   login: (body) => {
     return axios.post(`${BASE_URL}/user/login`, body);
@@ -15,9 +17,9 @@ const ApiClient = {
     });
   },
 
-  // TODO
-  getAllStocksPaginated: (jwt) => {
-    return axios.get(`${BASE_URL}/stock/`, {
+  getAllStocksPaginated: (jwt, page) => {
+    console.log(jwt)
+    return axios.get(`${BASE_URL}/stock/paginated?page=${page}&pageSize=${pageSize}`, {
       headers: {
         Authorization: jwt,
       },
@@ -40,8 +42,8 @@ const ApiClient = {
     });
   },
 
-  deleteProduct: (jwt, productId, ) => {
-    return axios.delete(`${BASE_URL}/product/${productId}`,  {
+  deleteProduct: (jwt, productId) => {
+    return axios.delete(`${BASE_URL}/product/${productId}`, {
       headers: {
         Authorization: jwt,
       },
@@ -64,14 +66,13 @@ const ApiClient = {
     });
   },
 
-  deleteStore: (jwt, storeId, ) => {
-    return axios.delete(`${BASE_URL}/product/${storeId}`,  {
+  deleteStore: (jwt, storeId) => {
+    return axios.delete(`${BASE_URL}/product/${storeId}`, {
       headers: {
         Authorization: jwt,
       },
     });
   },
-
 
   addNewStock: (jwt, newStock) => {
     return axios.post(`${BASE_URL}/stock/`, newStock, {
@@ -82,15 +83,19 @@ const ApiClient = {
   },
 
   increaseStock: (jwt, stockId, qty) => {
-    return axios.put(`${BASE_URL}/stock/${stockId}/increase/${qty}`,  {},{
-      headers: {
-        Authorization: jwt,
-      },
-    });
+    return axios.put(
+      `${BASE_URL}/stock/${stockId}/increase/${qty}`,
+      {},
+      {
+        headers: {
+          Authorization: jwt,
+        },
+      }
+    );
   },
 
-  deleteStock: (jwt, stockId, ) => {
-    return axios.delete(`${BASE_URL}/stock/${stockId}`,  {
+  deleteStock: (jwt, stockId) => {
+    return axios.delete(`${BASE_URL}/stock/${stockId}`, {
       headers: {
         Authorization: jwt,
       },
