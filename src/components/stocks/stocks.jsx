@@ -4,7 +4,7 @@ import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import ApiClient from "../../services/apiClient";
 import { useState, useEffect, useContext } from "react";
-import { Button } from "react-bootstrap";
+import {Button, Spinner} from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
@@ -40,8 +40,11 @@ const Stocks = () => {
         ApiClient.getAllStores(jwt)
           .then((allStoresResponse) => setStores(allStoresResponse.data))
           .then(() => {
-            ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) =>
-              setStocks(allStocksData.data)
+            ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
+              setLoading(false)
+                  setStocks(allStocksData.data)
+            }
+
             );
           });
       });
@@ -59,14 +62,20 @@ const Stocks = () => {
 
   const handleSaveNewStock = () => {
     apiClient.addNewStock(jwt, newStock).then(() => {
-      apiClient.getAllStocks().then((data) => setStocks(data));
+      ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
+        setLoading(false)
+        setStocks(allStocksData.data)
+      })
       setShowNewStockModal(false);
     });
   };
 
   const handleIncreaseQuantity = () => {
     ApiClient.increaseStock(jwt, selectedStock._id, quantity).then(() =>
-      ApiClient.getAllStocks(jwt).then((response) => setStocks(response.data))
+        ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
+          setLoading(false)
+          setStocks(allStocksData.data)
+        })
     );
     setShowIncreseModal(false);
   };
@@ -112,7 +121,6 @@ const Stocks = () => {
 
   const handlePageChange = (pageNumber) => {
     setLoading(true);
-    console.log(pageNumber)
     ApiClient.getAllStocksPaginated(jwt, pageNumber).then((response) => {
       setStocks(response.data);
       setLoading(false);
@@ -121,6 +129,7 @@ const Stocks = () => {
 
   return (
     <Container>
+      {!loading ? (
       <Row>
         <h1>Inventario</h1>
         <Col>
@@ -161,7 +170,13 @@ const Stocks = () => {
           </Table>
         </Col>
       </Row>
-
+      ) : (
+          <Row className="justify-content-md-center">
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          </Row>
+      )}
       <Row>
         <Paginator handlePageChange={handlePageChange} />
       </Row>
