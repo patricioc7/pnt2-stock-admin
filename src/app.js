@@ -8,6 +8,7 @@ import { getSessionCookie } from "./services/sessionCookie";
 import Products from "./components/products/products";
 import Stores from "./components/stores/stores";
 import History from "./components/history/history";
+import Customers from "./components/customers/customers";
 
 export default function App() {
   const [session, setSession] = useState(getSessionCookie());
@@ -36,6 +37,9 @@ export default function App() {
             </Route>
             <Route path="/history">
               <History />
+            </Route>
+            <Route path="/customers">
+              <Customers />
             </Route>
             <Route path="/">
               <Stocks />

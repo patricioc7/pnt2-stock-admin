@@ -139,5 +139,29 @@ const ApiClient = {
       },
     });
   },
+
+  getAllCustomers: (jwt) => {
+    return axios.get(`${BASE_URL}/customer/`, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
+
+  addNewCustomer: (jwt, newCustomer) => {
+    return axios.post(`${BASE_URL}/customer/`, newCustomer, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
+
+  deleteCustomer: (jwt, customerId) => {
+    return axios.delete(`${BASE_URL}/customer/${customerId}`, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
 };
 export default ApiClient;

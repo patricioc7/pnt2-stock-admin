@@ -20,6 +20,7 @@ const Navigator = () => {
               <>
                 <Nav.Link href="/products">Productos</Nav.Link>
                 <Nav.Link href="/stores">Stores</Nav.Link>
+                <Nav.Link href="/customers">Customers</Nav.Link>
                 <Nav.Link href="/history">Historial</Nav.Link>
               </>
             )}
