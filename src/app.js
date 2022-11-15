@@ -45,8 +45,8 @@ export default function App() {
               <Stocks />
             </Route>
           </Switch>
+          <Footer />
         </div>
-        <Footer />
       </Router>
     </SessionContext.Provider>
   );

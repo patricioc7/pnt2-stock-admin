@@ -36,7 +36,7 @@ const Products = () => {
 
   const handleSaveNewProduct = () => {
     apiClient.addNewProduct(jwt, newProduct).then(() => {
-      apiClient.getAllProducts().then((data) => setProducts(data));
+      apiClient.getAllProducts(jwt).then((response) => setProducts(response.data));
       setShowNewProductModal(false);
     });
   };
@@ -80,7 +80,7 @@ const Products = () => {
                 {products &&
                   products.map((product) => {
                     return (
-                      <tr>
+                      <tr key={product._id}>
                         <td>{product._id}</td>
                         <td>{product.sku}</td>
                         <td>{product.name}</td>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = process.env.BASE_URL
 
 const pageSize = 5;
 const historyPageSize = 10;
@@ -93,6 +93,14 @@ const ApiClient = {
 
   addNewStock: (jwt, newStock) => {
     return axios.post(`${BASE_URL}/stock/`, newStock, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
+
+  sellStock: (jwt, stockId, customerId, qty) => {
+    return axios.put(`${BASE_URL}/stock/${stockId}/sell/${customerId}/${qty}`,undefined, {
       headers: {
         Authorization: jwt,
       },

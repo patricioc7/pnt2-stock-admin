@@ -4,7 +4,7 @@ import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import ApiClient from "../../services/apiClient";
 import { useState, useEffect, useContext } from "react";
-import { Button, Spinner } from "react-bootstrap";
+import {Alert, Button, Spinner} from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
@@ -21,14 +21,19 @@ const Stocks = () => {
   const [stocks, setStocks] = useState(undefined);
   const [products, setProducts] = useState(undefined);
   const [stores, setStores] = useState(undefined);
+  const [customers, setCustomers] = useState(undefined);
   const [showNewStockModal, setShowNewStockModal] = useState(false);
   const [newStock, setNewStock] = useState({});
+  const [sellingStock, setSellingStock] = useState({});
   const [loading, setLoading] = useState(true);
   const [pageQuantity, setPageQuantity] = useState(0);
+  const [currentCustomer, setCurrentCustomer] = useState(undefined);
+  const [error, setError] = useState(undefined);
 
   const [selectedStock, setSelectedStock] = useState({});
   const [quantity, setQuantity] = useState(0);
   const [showIncreseModal, setShowIncreseModal] = useState(false);
+  const [showSellModal, setShowSellModal] = useState(false);
 
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
 
@@ -39,6 +44,9 @@ const Stocks = () => {
       ApiClient.getAllProducts(jwt)
         .then((allProductsResponse) => setProducts(allProductsResponse.data))
         .then(() => {
+          ApiClient.getAllCustomers(jwt)
+              .then((allCustomerResponses) => setCustomers(allCustomerResponses.data))
+              .then(() => {
           ApiClient.getAllStores(jwt)
             .then((allStoresResponse) => setStores(allStoresResponse.data))
             .then(() => {
@@ -57,6 +65,7 @@ const Stocks = () => {
                   )
                 );
             });
+              });
         });
     }
   }, [jwt]);
@@ -66,6 +75,10 @@ const Stocks = () => {
 
   const handleCloseAddModal = () => setShowIncreseModal(false);
   const handleCloseDeleteModal = () => setShowConfirmDeleteModal(false);
+  const handleCloseSellModal = () => {
+    setShowSellModal(false);
+    setError(undefined)
+  }
 
   const handleQuantityChange = (qty) => {
     setQuantity(qty);
@@ -91,6 +104,19 @@ const Stocks = () => {
     setShowIncreseModal(false);
   };
 
+  const handleSellStock = () => {
+    ApiClient.sellStock(jwt, sellingStock._id, currentCustomer, quantity).then(() =>
+        ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
+          setLoading(false);
+          setStocks(allStocksData.data);
+          setShowSellModal(false);
+        })
+    ).catch(
+        _e => setError("Stock insuficiente")
+    );
+
+  };
+
   const getProductName = (productId) => {
     if (products) {
       const found = products.find((p) => productId === p._id);
@@ -112,6 +138,11 @@ const Stocks = () => {
   const handleIncreaseModalShow = (stock) => {
     setSelectedStock(stock);
     setShowIncreseModal(true);
+  };
+
+  const handleSellModalShow = (stock) => {
+    setSellingStock(stock);
+    setShowSellModal(true);
   };
 
   const handleDeleteConfirmation = (stock) => {
@@ -167,7 +198,7 @@ const Stocks = () => {
                     {stocks &&
                       stocks.map((stock) => {
                         return (
-                          <tr>
+                          <tr key={stock._id}>
                             <td>{stock._id}</td>
                             <td>{getProductName(stock.productId)}</td>
                             <td>{stock.qty}</td>
@@ -176,7 +207,7 @@ const Stocks = () => {
                               <AiFillPlusCircle
                                 onClick={() => handleIncreaseModalShow(stock)}
                               />
-                              <AiFillDollarCircle />
+                              <AiFillDollarCircle  onClick={() => handleSellModalShow(stock)}/>
                               <AiOutlineDelete
                                 onClick={() => handleDeleteConfirmation(stock)}
                               />
@@ -290,7 +321,65 @@ const Stocks = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      {/* END INCREASE STOCK MODAL*/}
+      {/* END ADD STOCK MODAL*/}
+
+      {/*SELL STOCK MODAL*/}
+      <Modal show={showSellModal} onHide={handleCloseSellModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Vender stock</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="quantity">
+              <p>
+                <b>Stock:</b> {selectedStock._id}
+              </p>
+              <p>
+                <b>Producto:</b> {getProductName(selectedStock.productId)}
+              </p>
+
+              <Form.Label>Cantidad:</Form.Label>
+              <Form.Control
+                  type="number"
+                  placeholder="0"
+                  onChange={(e) => handleQuantityChange(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label>Customer:</Form.Label>
+              <Form.Select
+                  onChange={(e) =>
+                      setCurrentCustomer(e.target.value)
+                  }
+              >
+                <option key="0" value={undefined}>
+                  elija una opcion:
+                </option>
+                {customers &&
+                    customers.map((customer) => {
+                      return (
+                          <option key={customer._id} value={customer._id}>
+                            {customer.name}
+                          </option>
+                      );
+                    })}
+              </Form.Select>
+            </Form.Group>
+          </Form>
+          {error && (
+              <Alert variant="danger">{error}</Alert>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseSellModal}>
+            Cerrar
+          </Button>
+          <Button variant="primary" onClick={handleSellStock}>
+            Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* END ADD STOCK MODAL*/}
 
       {/*DELETE STOCK MODAL*/}
       <Modal show={showConfirmDeleteModal} onHide={handleCloseDeleteModal}>
