@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = process.env.BASE_URL
+const BASE_URL = "https://taller-prog-2-stock.herokuapp.com/"
 
 const pageSize = 5;
 const historyPageSize = 10;
