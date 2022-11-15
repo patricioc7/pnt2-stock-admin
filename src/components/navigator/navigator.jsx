@@ -1,7 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import Login from "./login";
+import LoginAndRegister from "./loginAndRegister";
 
 const Navigator = () => {
   return (
@@ -17,7 +17,7 @@ const Navigator = () => {
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
-          <Login />
+          <LoginAndRegister />
         </Navbar.Collapse>
       </Container>
     </Navbar>

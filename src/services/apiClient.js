@@ -9,6 +9,10 @@ const ApiClient = {
     return axios.post(`${BASE_URL}/user/login`, body);
   },
 
+  registerNewUser: (body) => {
+    return axios.post(`${BASE_URL}/user`, body);
+  },
+
   getAllStocks: (jwt) => {
     return axios.get(`${BASE_URL}/stock/`, {
       headers: {
@@ -18,12 +22,15 @@ const ApiClient = {
   },
 
   getAllStocksPaginated: (jwt, page) => {
-    console.log(jwt)
-    return axios.get(`${BASE_URL}/stock/paginated?page=${page}&pageSize=${pageSize}`, {
-      headers: {
-        Authorization: jwt,
-      },
-    });
+    console.log(jwt);
+    return axios.get(
+      `${BASE_URL}/stock/paginated?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: jwt,
+        },
+      }
+    );
   },
 
   getAllProducts: (jwt) => {

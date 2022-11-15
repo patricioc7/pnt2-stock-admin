@@ -4,7 +4,7 @@ import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import ApiClient from "../../services/apiClient";
 import { useState, useEffect, useContext } from "react";
-import {Button, Spinner} from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
@@ -41,11 +41,9 @@ const Stocks = () => {
           .then((allStoresResponse) => setStores(allStoresResponse.data))
           .then(() => {
             ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
-              setLoading(false)
-                  setStocks(allStocksData.data)
-            }
-
-            );
+              setLoading(false);
+              setStocks(allStocksData.data);
+            });
           });
       });
   }, []);
@@ -63,19 +61,19 @@ const Stocks = () => {
   const handleSaveNewStock = () => {
     apiClient.addNewStock(jwt, newStock).then(() => {
       ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
-        setLoading(false)
-        setStocks(allStocksData.data)
-      })
+        setLoading(false);
+        setStocks(allStocksData.data);
+      });
       setShowNewStockModal(false);
     });
   };
 
   const handleIncreaseQuantity = () => {
     ApiClient.increaseStock(jwt, selectedStock._id, quantity).then(() =>
-        ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
-          setLoading(false)
-          setStocks(allStocksData.data)
-        })
+      ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
+        setLoading(false);
+        setStocks(allStocksData.data);
+      })
     );
     setShowIncreseModal(false);
   };
@@ -130,52 +128,52 @@ const Stocks = () => {
   return (
     <Container>
       {!loading ? (
-      <Row>
-        <h1>Inventario</h1>
-        <Col>
-          <Button onClick={handleShowNewStockModal}>Sumar nuevo stock</Button>
-          <hr />
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Store</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stocks &&
-                stocks.map((stock) => {
-                  return (
-                    <tr>
-                      <td>{stock._id}</td>
-                      <td>{getProductName(stock.productId)}</td>
-                      <td>{stock.qty}</td>
-                      <td>{getStoreName(stock.storeId)}</td>
-                      <td>
-                        <AiFillPlusCircle
-                          onClick={() => handleIncreaseModalShow(stock)}
-                        />
-                        <AiFillDollarCircle />
-                        <AiOutlineDelete
-                          onClick={() => handleDeleteConfirmation(stock)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
+        <Row>
+          <h1>Inventario</h1>
+          <Col>
+            <Button onClick={handleShowNewStockModal}>Sumar nuevo stock</Button>
+            <hr />
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Store</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stocks &&
+                  stocks.map((stock) => {
+                    return (
+                      <tr>
+                        <td>{stock._id}</td>
+                        <td>{getProductName(stock.productId)}</td>
+                        <td>{stock.qty}</td>
+                        <td>{getStoreName(stock.storeId)}</td>
+                        <td>
+                          <AiFillPlusCircle
+                            onClick={() => handleIncreaseModalShow(stock)}
+                          />
+                          <AiFillDollarCircle />
+                          <AiOutlineDelete
+                            onClick={() => handleDeleteConfirmation(stock)}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
       ) : (
-          <Row className="justify-content-md-center">
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </Row>
+        <Row className="justify-content-md-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </Row>
       )}
       <Row>
         <Paginator handlePageChange={handlePageChange} />

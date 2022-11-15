@@ -59,9 +59,7 @@ const Stores = () => {
       <Row>
         <h1>Stores</h1>
         <Col>
-          <Button onClick={handleShowNewStoreModal}>
-            Sumar nuevo store
-          </Button>
+          <Button onClick={handleShowNewStoreModal}>Sumar nuevo store</Button>
           <hr />
           <Table striped bordered hover>
             <thead>
