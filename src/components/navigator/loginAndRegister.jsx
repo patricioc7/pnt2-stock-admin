@@ -1,4 +1,4 @@
-import { Button } from "react-bootstrap";
+import { Alert, Button } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import { useContext, useState } from "react";
@@ -15,6 +15,8 @@ const LoginAndRegister = () => {
   const [userNameAndPassword, setUsernameAndPassword] = useState({});
   const [registerObject, setRegisterObject] = useState({});
   const [registrationResult, setRegistrationResult] = useState(undefined);
+  const [loginError, setLoginError] = useState(false);
+
   const session = useContext(SessionContext);
 
   const handleLoginFormChanges = (field, value) => {
@@ -39,15 +41,18 @@ const LoginAndRegister = () => {
     setShowLoginModal(false);
     setShowRegisterModal(false);
     setRegistrationResult(undefined);
+    setLoginError(false);
   };
 
   const handleLogin = () => {
-    apiClient.login(userNameAndPassword).then((response) => {
-      setSessionCookie(response.data.token);
-      window.location.reload();
-    });
-
-    setShowLoginModal(false);
+    apiClient
+      .login(userNameAndPassword)
+      .then((response) => {
+        setSessionCookie(response.data.token);
+        window.location.reload();
+        setShowLoginModal(false);
+      })
+      .catch((_error) => setLoginError(true));
   };
 
   const handleRegister = () => {
@@ -109,6 +114,9 @@ const LoginAndRegister = () => {
               />
             </Form.Group>
           </Form>
+          {loginError && (
+            <Alert variant="danger">Credenciales incorrectas.</Alert>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModals}>
@@ -167,7 +175,7 @@ const LoginAndRegister = () => {
               <h1>Registración exitosa</h1>
             ) : (
               <h1>Oops, error</h1>
-            )}{" "}
+            )}
           </Modal.Body>
         )}
         <Modal.Footer>

@@ -10,22 +10,23 @@ import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
 import { SessionContext } from "../../context/sessionContext";
 import { AiOutlineDelete } from "react-icons/ai";
+import LoadingSpinner from "../common/spinner";
 
 const Products = () => {
   const [products, setProducts] = useState(undefined);
   const [showNewProductModal, setShowNewProductModal] = useState(false);
   const [newProduct, setNewProduct] = useState({});
-
+  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState({});
-
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
 
   const jwt = useContext(SessionContext);
 
   useEffect(() => {
-    ApiClient.getAllProducts(jwt).then((allProductsResponse) =>
-      setProducts(allProductsResponse.data)
-    );
+    ApiClient.getAllProducts(jwt).then((allProductsResponse) => {
+      setLoading(false);
+      setProducts(allProductsResponse.data);
+    });
   }, []);
 
   const handleCloseNewProductModal = () => setShowNewProductModal(false);
@@ -50,7 +51,7 @@ const Products = () => {
       .deleteProduct(jwt, selectedProduct._id)
       .then(() =>
         apiClient
-          .getAllStocks(jwt)
+          .getAllProducts(jwt)
           .then((response) => setProducts(response.data))
       );
     setShowConfirmDeleteModal(false);
@@ -65,33 +66,37 @@ const Products = () => {
             Sumar nuevo producto
           </Button>
           <hr />
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>SKU</th>
-                <th>Nombre</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products &&
-                products.map((product) => {
-                  return (
-                    <tr>
-                      <td>{product._id}</td>
-                      <td>{product.sku}</td>
-                      <td>{product.name}</td>
-                      <td>
-                        <AiOutlineDelete
-                          onClick={() => handleDeleteConfirmation(product)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </Table>
+          {!loading ? (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>SKU</th>
+                  <th>Nombre</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products &&
+                  products.map((product) => {
+                    return (
+                      <tr>
+                        <td>{product._id}</td>
+                        <td>{product.sku}</td>
+                        <td>{product.name}</td>
+                        <td>
+                          <AiOutlineDelete
+                            onClick={() => handleDeleteConfirmation(product)}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </Table>
+          ) : (
+            <LoadingSpinner />
+          )}
         </Col>
       </Row>
 

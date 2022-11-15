@@ -6,7 +6,7 @@ const Paginator = (params) => {
 
   let items = [];
   // Solo 10 páginas porque no se sabe el total real
-  for (let number = 1; number <= 10; number++) {
+  for (let number = 1; number <= params.pageQty; number++) {
     items.push(
       <Pagination.Item
         onClick={() => {
@@ -21,11 +21,21 @@ const Paginator = (params) => {
     );
   }
 
+  const handlePrev = () => {
+    params.handlePageChange(active - 2);
+    setActive(active - 1);
+  };
+
+  const handleNext = () => {
+    params.handlePageChange(active);
+    setActive(active + 1);
+  };
+
   return (
     <Pagination>
-      <Pagination.Prev />
+      <Pagination.Prev onClick={handlePrev} />
       {items}
-      <Pagination.Next />
+      <Pagination.Next onClick={handleNext} />
     </Pagination>
   );
 };

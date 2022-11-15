@@ -15,6 +15,7 @@ import {
   AiOutlineDelete,
 } from "react-icons/ai";
 import Paginator from "../paginator/paginator";
+import LoadingSpinner from "../common/spinner";
 
 const Stocks = () => {
   const [stocks, setStocks] = useState(undefined);
@@ -22,8 +23,8 @@ const Stocks = () => {
   const [stores, setStores] = useState(undefined);
   const [showNewStockModal, setShowNewStockModal] = useState(false);
   const [newStock, setNewStock] = useState({});
-
   const [loading, setLoading] = useState(true);
+  const [pageQuantity, setPageQuantity] = useState(0);
 
   const [selectedStock, setSelectedStock] = useState({});
   const [quantity, setQuantity] = useState(0);
@@ -34,19 +35,31 @@ const Stocks = () => {
   const jwt = useContext(SessionContext);
 
   useEffect(() => {
-    ApiClient.getAllProducts(jwt)
-      .then((allProductsResponse) => setProducts(allProductsResponse.data))
-      .then(() => {
-        ApiClient.getAllStores(jwt)
-          .then((allStoresResponse) => setStores(allStoresResponse.data))
-          .then(() => {
-            ApiClient.getAllStocksPaginated(jwt, 0).then((allStocksData) => {
-              setLoading(false);
-              setStocks(allStocksData.data);
+    if (jwt) {
+      ApiClient.getAllProducts(jwt)
+        .then((allProductsResponse) => setProducts(allProductsResponse.data))
+        .then(() => {
+          ApiClient.getAllStores(jwt)
+            .then((allStoresResponse) => setStores(allStoresResponse.data))
+            .then(() => {
+              apiClient
+                .getStocksPages(jwt)
+                .then((pageQtyResponse) => {
+                  console.log(pageQtyResponse);
+                  setPageQuantity(pageQtyResponse.data);
+                })
+                .then(() =>
+                  ApiClient.getAllStocksPaginated(jwt, 0).then(
+                    (allStocksData) => {
+                      setLoading(false);
+                      setStocks(allStocksData.data);
+                    }
+                  )
+                );
             });
-          });
-      });
-  }, []);
+        });
+    }
+  }, [jwt]);
 
   const handleCloseNewStockModal = () => setShowNewStockModal(false);
   const handleShowNewStockModal = () => setShowNewStockModal(true);
@@ -107,13 +120,14 @@ const Stocks = () => {
   };
 
   const handleDelete = () => {
-    apiClient
-      .deleteProduct(jwt, selectedStock._id)
-      .then(() =>
-        apiClient
-          .getAllProducts(jwt)
-          .then((response) => setStocks(response.data))
-      );
+    setLoading(true);
+    apiClient.deleteStock(jwt, selectedStock._id).then(() => {
+      setLoading(true);
+      ApiClient.getAllStocksPaginated(jwt, 0).then((response) => {
+        setStocks(response.data);
+        setLoading(false);
+      });
+    });
     setShowConfirmDeleteModal(false);
   };
 
@@ -127,57 +141,64 @@ const Stocks = () => {
 
   return (
     <Container>
-      {!loading ? (
-        <Row>
-          <h1>Inventario</h1>
-          <Col>
-            <Button onClick={handleShowNewStockModal}>Sumar nuevo stock</Button>
-            <hr />
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Id</th>
-                  <th>Producto</th>
-                  <th>Cantidad</th>
-                  <th>Store</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stocks &&
-                  stocks.map((stock) => {
-                    return (
-                      <tr>
-                        <td>{stock._id}</td>
-                        <td>{getProductName(stock.productId)}</td>
-                        <td>{stock.qty}</td>
-                        <td>{getStoreName(stock.storeId)}</td>
-                        <td>
-                          <AiFillPlusCircle
-                            onClick={() => handleIncreaseModalShow(stock)}
-                          />
-                          <AiFillDollarCircle />
-                          <AiOutlineDelete
-                            onClick={() => handleDeleteConfirmation(stock)}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
+      {!jwt ? (
+        <p>Por favor logueese o registrese.</p>
       ) : (
-        <Row className="justify-content-md-center">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        </Row>
+        <>
+          <Row>
+            <h1>Inventario</h1>
+            <Col>
+              <Button onClick={handleShowNewStockModal}>
+                Sumar nuevo stock
+              </Button>
+              <hr />
+              {!loading ? (
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Store</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stocks &&
+                      stocks.map((stock) => {
+                        return (
+                          <tr>
+                            <td>{stock._id}</td>
+                            <td>{getProductName(stock.productId)}</td>
+                            <td>{stock.qty}</td>
+                            <td>{getStoreName(stock.storeId)}</td>
+                            <td>
+                              <AiFillPlusCircle
+                                onClick={() => handleIncreaseModalShow(stock)}
+                              />
+                              <AiFillDollarCircle />
+                              <AiOutlineDelete
+                                onClick={() => handleDeleteConfirmation(stock)}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </Table>
+              ) : (
+                <LoadingSpinner />
+              )}
+            </Col>
+          </Row>
+          <Row>
+            <Paginator
+              handlePageChange={handlePageChange}
+              pageQty={pageQuantity}
+            />
+          </Row>
+        </>
       )}
-      <Row>
-        <Paginator handlePageChange={handlePageChange} />
-      </Row>
 
       {/*NEW INCREASE MODAL*/}
       <Modal show={showNewStockModal} onHide={handleCloseNewStockModal}>
@@ -282,7 +303,7 @@ const Stocks = () => {
             Cerrar
           </Button>
           <Button variant="primary" onClick={handleDelete}>
-            Guardar
+            Borrar
           </Button>
         </Modal.Footer>
       </Modal>

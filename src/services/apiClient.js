@@ -2,7 +2,8 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:3000";
 
-const pageSize = 3;
+const pageSize = 5;
+const historyPageSize = 10;
 
 const ApiClient = {
   login: (body) => {
@@ -31,6 +32,15 @@ const ApiClient = {
         },
       }
     );
+  },
+
+  getStocksPages: (jwt) => {
+    console.log(jwt);
+    return axios.get(`${BASE_URL}/stock/pages?pageSize=${pageSize}`, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
   },
 
   getAllProducts: (jwt) => {
@@ -74,7 +84,7 @@ const ApiClient = {
   },
 
   deleteStore: (jwt, storeId) => {
-    return axios.delete(`${BASE_URL}/product/${storeId}`, {
+    return axios.delete(`${BASE_URL}/store/${storeId}`, {
       headers: {
         Authorization: jwt,
       },
@@ -103,6 +113,27 @@ const ApiClient = {
 
   deleteStock: (jwt, stockId) => {
     return axios.delete(`${BASE_URL}/stock/${stockId}`, {
+      headers: {
+        Authorization: jwt,
+      },
+    });
+  },
+
+  getHistoryPaginated: (jwt, page) => {
+    console.log(jwt);
+    return axios.get(
+      `${BASE_URL}/history?page=${page}&pageSize=${historyPageSize}`,
+      {
+        headers: {
+          Authorization: jwt,
+        },
+      }
+    );
+  },
+
+  getHistoryPages: (jwt) => {
+    console.log(jwt);
+    return axios.get(`${BASE_URL}/history/pages?pageSize=${historyPageSize}`, {
       headers: {
         Authorization: jwt,
       },

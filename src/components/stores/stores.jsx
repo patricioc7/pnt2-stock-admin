@@ -10,22 +10,23 @@ import Form from "react-bootstrap/Form";
 import apiClient from "../../services/apiClient";
 import { SessionContext } from "../../context/sessionContext";
 import { AiOutlineDelete } from "react-icons/ai";
+import LoadingSpinner from "../common/spinner";
 
 const Stores = () => {
   const [stores, setStores] = useState(undefined);
   const [showNewStoreModal, setShowNewStoreModal] = useState(false);
   const [newStore, setNewStore] = useState({});
-
+  const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState({});
-
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
 
   const jwt = useContext(SessionContext);
 
   useEffect(() => {
-    ApiClient.getAllStores(jwt).then((allStoresResponse) =>
-      setStores(allStoresResponse.data)
-    );
+    ApiClient.getAllStores(jwt).then((allStoresResponse) => {
+      setStores(allStoresResponse.data);
+      setLoading(false);
+    });
   }, []);
 
   const handleCloseNewStoreModal = () => setShowNewStoreModal(false);
@@ -61,31 +62,35 @@ const Stores = () => {
         <Col>
           <Button onClick={handleShowNewStoreModal}>Sumar nuevo store</Button>
           <hr />
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stores &&
-                stores.map((store) => {
-                  return (
-                    <tr>
-                      <td>{store._id}</td>
-                      <td>{store.name}</td>
-                      <td>
-                        <AiOutlineDelete
-                          onClick={() => handleDeleteConfirmation(store)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </Table>
+          {!loading ? (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Nombre</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stores &&
+                  stores.map((store) => {
+                    return (
+                      <tr>
+                        <td>{store._id}</td>
+                        <td>{store.name}</td>
+                        <td>
+                          <AiOutlineDelete
+                            onClick={() => handleDeleteConfirmation(store)}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </Table>
+          ) : (
+            <LoadingSpinner />
+          )}
         </Col>
       </Row>
 
